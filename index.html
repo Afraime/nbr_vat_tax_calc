@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional VAT & Tax Calculator</title>
+    <title>Professional VAT & Tax Calculator - Pixmelab</title>
     <style>
         :root {
             --primary: #4361ee;
+            --secondary: #4b86f0; /* Color inspired by the logo's liquid */
             --success: #2ec4b6;
             --bg: #f8f9fa;
             --card: #ffffff;
             --text: #2b2d42;
+            --link: #0077b6; /* Distinct color for links */
         }
 
         body { 
@@ -18,6 +20,23 @@
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; margin: 0; color: var(--text);
+            padding: 20px;
+        }
+
+        .main-container {
+            display: flex; flex-direction: column; align-items: center; gap: 30px;
+        }
+
+        .logo-section { text-align: center; }
+        .logo-image { 
+            max-width: 150px; 
+            height: auto; 
+            display: block; 
+            margin: 0 auto; 
+            /* If the logo background isn't transparent, a mask might be needed. 
+               Alternatively, the body background can be set to the logo's light gray. */
+            background: #f4f4f4; /* Match logo background to avoid a box effect */
+            padding: 20px; border-radius: 15px; 
         }
 
         .container { 
@@ -65,55 +84,76 @@
         }
         .copy-btn:hover { background: #2b2d42; }
 
-        .badge { font-size: 0.7rem; padding: 2px 6px; background: #e0e7ff; border-radius: 4px; vertical-align: middle; }
+        .developer-badge {
+            margin-top: 20px; text-align: center; font-size: 0.8rem; color: #777;
+        }
+        .developer-badge a {
+            color: var(--link); text-decoration: none; font-weight: bold;
+        }
+        .developer-badge a:hover { text-decoration: underline; }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>TaxFlow <span style="font-weight: 300;">Pro</span></h2>
-    
-    <div class="mode-selector">
-        <button id="btnInc" class="mode-btn active" onclick="setMode('inc')">Inclusive</button>
-        <button id="btnExc" class="mode-btn" onclick="setMode('exc')">Exclusive</button>
+<div class="main-container">
+
+    <div class="logo-section">
+        <img src="logo.png" alt="Pixmelab Logo" class="logo-image" onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='block';">
+        <!-- Text fallback if logo image isn't available in the folder -->
+        <h1 id="logoFallback" style="display:none; font-family: sans-serif; font-weight:900; margin:0; padding-bottom:10px;">PIXMELAB</h1>
     </div>
 
-    <div class="input-group">
-        <label id="priceLabel">Grand Total (GT)</label>
-        <input type="number" id="price" placeholder="0.00" oninput="calculate()">
+    <div class="container">
+        <h2>TaxFlow <span style="font-weight: 300;">Pro</span></h2>
+        
+        <div class="mode-selector">
+            <button id="btnInc" class="mode-btn active" onclick="setMode('inc')">Inclusive</button>
+            <button id="btnExc" class="mode-btn" onclick="setMode('exc')">Exclusive</button>
+        </div>
+
+        <div class="input-group">
+            <label id="priceLabel">Grand Total (GT)</label>
+            <input type="number" id="price" placeholder="0.00" oninput="calculate()">
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <div class="input-group" style="flex: 1;">
+                <label>Tax %</label>
+                <input type="number" id="taxPer" value="5" oninput="calculate()">
+            </div>
+            <div class="input-group" style="flex: 1;">
+                <label>VAT %</label>
+                <input type="number" id="vatPer" value="10" oninput="calculate()">
+            </div>
+        </div>
+
+        <div class="results-panel">
+            <div class="res-row">
+                <span>Base Sub-Total:</span>
+                <span id="resSub">0.00</span>
+            </div>
+            <div class="res-row">
+                <span>VAT Amount:</span>
+                <span id="resVat">0.00</span>
+            </div>
+            <div class="res-row">
+                <span>Tax Amount:</span>
+                <span id="resTax">0.00</span>
+            </div>
+            <div class="res-row grand-total">
+                <span id="totalLabel">Final Sub-Total:</span>
+                <span id="resTotal">0.00</span>
+            </div>
+        </div>
+
+        <button class="copy-btn" onclick="copyResults()">Copy Results</button>
+
+        <div class="developer-badge">
+            Created by <a href="https://afraime.github.io/portfolio/" target="_blank">Afraime Sayed</a>
+        </div>
     </div>
 
-    <div style="display: flex; gap: 15px;">
-        <div class="input-group" style="flex: 1;">
-            <label>Tax %</label>
-            <input type="number" id="taxPer" value="5" oninput="calculate()">
-        </div>
-        <div class="input-group" style="flex: 1;">
-            <label>VAT %</label>
-            <input type="number" id="vatPer" value="10" oninput="calculate()">
-        </div>
-    </div>
-
-    <div class="results-panel">
-        <div class="res-row">
-            <span>Base Sub-Total:</span>
-            <span id="resSub">0.00</span>
-        </div>
-        <div class="res-row">
-            <span>VAT Amount:</span>
-            <span id="resVat">0.00</span>
-        </div>
-        <div class="res-row">
-            <span>Tax Amount:</span>
-            <span id="resTax">0.00</span>
-        </div>
-        <div class="res-row grand-total">
-            <span id="totalLabel">Final Sub-Total:</span>
-            <span id="resTotal">0.00</span>
-        </div>
-    </div>
-
-    <button class="copy-btn" onclick="copyResults()">Copy Results to Clipboard</button>
 </div>
 
 <script>
