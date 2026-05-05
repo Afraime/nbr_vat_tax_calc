@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT & Tax Calculator</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #333; text-align: center; margin-top: 0; }
+        .group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+        button:hover { background-color: #218838; }
+        #results { margin-top: 20px; padding: 15px; background: #e9ecef; border-radius: 4px; display: none; }
+        .res-line { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px solid #dee2e6; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>VAT & Tax Calc</h2>
+    
+    <div class="group">
+        <label>Calculation Mode</label>
+        <select id="mode" onchange="toggleInputs()">
+            <option value="inc">From Grand Total (Inclusive)</option>
+            <option value="exc">From Sub-Total (Exclusive)</option>
+        </select>
+    </div>
+
+    <div class="group">
+        <label id="priceLabel">Grand Total Price:</label>
+        <input type="number" id="price" placeholder="0.00">
+    </div>
+
+    <div class="group">
+        <label>Tax %:</label>
+        <input type="number" id="taxPer" placeholder="e.g. 5">
+    </div>
+
+    <div class="group" id="vatInputGroup">
+        <label>VAT %:</label>
+        <input type="number" id="vatPer" value="10">
+    </div>
+
+    <button onclick="calculate()">Calculate Now</button>
+
+    <div id="results">
+        <div class="res-line"><span>VAT:</span> <strong id="resVat">0</strong></div>
+        <div class="res-line"><span>Tax:</span> <strong id="resTax">0</strong></div>
+        <div class="res-line" style="border:none; margin-top:10px;"><span id="totalLabel">Sub-Total:</span> <strong id="resTotal" style="color:#28a745;">0</strong></div>
+    </div>
+</div>
+
+<script>
+    function toggleInputs() {
+        const mode = document.getElementById('mode').value;
+        const vatGroup = document.getElementById('vatInputGroup');
+        const priceLabel = document.getElementById('priceLabel');
+        
+        if (mode === 'inc') {
+            vatGroup.style.display = 'block';
+            priceLabel.innerText = "Grand Total Price:";
+        } else {
+            vatGroup.style.display = 'none';
+            priceLabel.innerText = "Sub-Total Price:";
+        }
+    }
+
+    function calculate() {
+        const mode = document.getElementById('mode').value;
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const t_per = parseFloat(document.getElementById('taxPer').value) || 0;
+        const v_per = parseFloat(document.getElementById('vatPer').value) || 0;
+        
+        let vat, tax, resultTotal;
+
+        if (mode === 'inc') {
+            // Formula: VAT= GT-(GT/((100+percentage)/100))
+            vat = price - (price / ((100 + v_per) / 100));
+            // Formula: Tax = (GT-VAT)*percentage%
+            tax = (price - vat) * (t_per / 100);
+            resultTotal = price - vat - tax;
+            document.getElementById('totalLabel').innerText = "Remaining Sub-Total:";
+        } else {
+            // Formula: tax=(ST/((100-percentage)/100)*percentage%)
+            tax = (price / ((100 - t_per) / 100)) * (t_per / 100);
+            // Formula: vat= (ST+tax)*10%
+            vat = (price + tax) * 0.10;
+            resultTotal = price + tax + vat;
+            document.getElementById('totalLabel').innerText = "New Grand Total:";
+        }
+
+        document.getElementById('resVat').innerText = vat.toFixed(2);
+        document.getElementById('resTax').innerText = tax.toFixed(2);
+        document.getElementById('resTotal').innerText = resultTotal.toFixed(2);
+        document.getElementById('results').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
